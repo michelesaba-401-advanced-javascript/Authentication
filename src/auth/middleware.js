@@ -23,18 +23,18 @@ module.exports = (req, res, next) => {
     let bufferString = base64Buffer.toString(); // john:mysecret
     console.log({ base64Buffer, bufferString });
     let [username, password] = bufferString.split(":"); // variables username="john" and password="mysecret"
-    let auth = [username, password]; // {username:"john", password:"mysecret"}
+    let auth = {username, password}; // {username:"john", password:"mysecret"}
 
     return User.authenticateBasic(auth).then(user => _authenticate(user));
   }
 
   function _authenticate(user) {
+    console.log("_authenticate", user);
     if (user) {
       next();
     } else {
-      _authError();
+      return _authError();
     }
-    return Promise.resolve();
   }
 
   function _authError() {

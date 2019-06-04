@@ -3,16 +3,14 @@
 const auth = require("../../../src/auth/middleware.js");
 const User = require("../../../src/auth/users-model.js");
 const mongoose = require("mongoose");
-let users = [
-  { username: "Jane", password: "password1", role: "admin" },
-  { username: "Jill", password: "password2", role: "editor" },
-  { username: "Jake", password: "password3", role: "user" }
-];
+let users = {
+  admin: { username: "admin", password: "password", role: "admin" },
+  editor: { username: "editor", password: "password", role: "editor" },
+  user: { username: "user", password: "password", role: "user" }
+};
 
 describe("Auth Middleware", () => {
   beforeAll(async () => {
-    await User.deleteMany({});
-
     const options = {
       useNewUrlParser: true,
       useCreateIndex: true
@@ -21,9 +19,13 @@ describe("Auth Middleware", () => {
       process.env.MONGODB_URI || "mongodb://localhost/auth_test",
       options
     );
+
+    await new User(users.admin).save();
+    await new User(users.editor).save();
+    await new User(users.user).save();
   });
   afterAll(async () => {
-    await mongoose.close();
+    await User.deleteMany({});
   });
   // admin:password: YWRtaW46cGFzc3dvcmQ=
   // admin:foo: YWRtaW46Zm9v
@@ -34,7 +36,7 @@ describe("Auth Middleware", () => {
     statusMessage: "Unauthorized"
   };
 
-  describe("user authentication", async () => {
+  describe("user authentication", () => {
     let cachedToken;
 
     it("fails a login for a user (admin) with the incorrect basic credentials", () => {
