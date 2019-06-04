@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const User = require('./users-model.js');
+const User = require("./users-model.js");
 
 module.exports = (req, res, next) => {
 
@@ -11,10 +11,10 @@ module.exports = (req, res, next) => {
     // BASIC Auth  ... Authorization:Basic ZnJlZDpzYW1wbGU=
 
     switch(authType.toLowerCase()) {
-      case 'basic':
-        return _authBasic(encodedString);
-      default:
-        return _authError();
+    case "basic":
+      return _authBasic(encodedString);
+    default:
+      return _authError();
     }
 
   } catch(e) {
@@ -22,9 +22,9 @@ module.exports = (req, res, next) => {
   }
 
   function _authBasic() {
-    let base64Buffer = Buffer.from(authString,'base64'); // <Buffer 01 02...>
+    let base64Buffer = Buffer.from(authString,"base64"); // <Buffer 01 02...>
     let bufferString = base64Buffer.toString(); // john:mysecret
-    let [username,password] = bufferString.split(':');  // variables username="john" and password="mysecret"
+    let [username,password] = bufferString.split(":");  // variables username="john" and password="mysecret"
     let auth = [username,password];  // {username:"john", password:"mysecret"}
 
     return User.authenticateBasic(auth)
@@ -41,7 +41,7 @@ module.exports = (req, res, next) => {
   }
 
   function _authError() {
-    next({status: 401, statusMessage: 'Unauthorized', message: 'Invalid User ID/Password'});
+    next({status: 401, statusMessage: "Unauthorized", message: "Invalid User ID/Password"});
   }
 
 };
