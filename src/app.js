@@ -8,7 +8,7 @@ const morgan = require("morgan");
 // Esoteric Resources
 const errorHandler = require("./middleware/error.js");
 const notFound = require("./middleware/404.js");
-const authRouter = require("./auth/router.js");
+const authRouter = require("./auth/router");
 const router = require("./routes/books");
 
 // Prepare the express app

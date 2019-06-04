@@ -1,24 +1,22 @@
 "use strict";
-
 process.env.STORAGE = "mongo";
-
 const jwt = require("jsonwebtoken");
 const User = require("../../../src/auth/users-model");
-
+const mongoose = require("mongoose");
 const { server } = require("../../../src/app.js");
 const supertest = require("supertest");
 const mockRequest = supertest(server);
 
 let users = {
-  admin: { username: "admin", password: "password", role: "admin" },
-//  editor: { username: "editor", password: "password", role: "editor" },
-//  user: { username: "user", password: "password", role: "user" }
+  admin: { username: "admin", password: "password", role: "admin" }
+  //  editor: { username: "editor", password: "password", role: "editor" },
+  //  user: { username: "user", password: "password", role: "user" }
 };
 
 describe("Auth Router", () => {
   beforeAll(async () => {
     await User.deleteMany({});
-    const mongoose = require("mongoose");
+
     const options = {
       useNewUrlParser: true,
       useCreateIndex: true
@@ -28,22 +26,21 @@ describe("Auth Router", () => {
       options
     );
   });
-
-  // afterAll(async () => {
-  //   await User.deleteMany({});
-  // });
+  afterAll(async () => {
+    await mongoose.close();
+  });
 
   Object.keys(users).forEach(userType => {
     describe.only(`${userType} users`, () => {
       let encodedToken;
       let id;
-
       it("can create one", () => {
         return mockRequest
           .post("/signup")
           .send(users[userType])
           .expect(200)
           .then(results => {
+            expect(results.text).toBeDefined();
             console.log("signup results.text", results.text);
             var token = jwt.verify(
               results.text,
@@ -53,6 +50,7 @@ describe("Auth Router", () => {
             encodedToken = results.text;
             expect(token.id).toBeDefined();
             expect(token.capabilities).toBeDefined();
+            done();
           });
       });
 
@@ -67,6 +65,7 @@ describe("Auth Router", () => {
             );
             expect(token.id).toEqual(id);
             expect(token.capabilities).toBeDefined();
+            done();
           });
       });
     });
